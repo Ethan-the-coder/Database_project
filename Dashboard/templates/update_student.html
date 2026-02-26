@@ -22,6 +22,18 @@
                     <form method="POST">
                         {% csrf_token %}
 
+                        {% if student.image %}
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <img src="{{ student.image.url }}" alt="" class="rounded mb-2" width="300">
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                           <label class="form-label">Change Student Image:</label>
+                            <input type="file" name="image" class="form-control">
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
                             <input type="text" name="name" class="form-control" value="{{ student.name }}">
