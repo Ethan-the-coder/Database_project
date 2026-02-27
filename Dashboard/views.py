@@ -42,3 +42,12 @@ def update_student(request,id):
         student.save()
         return redirect('dashboard')
     return render(request, 'update_student.html', {'student': student})
+
+def delete_student(request, id):
+    student = get_object_or_404(Student, id=id)
+    if request.method == 'POST':
+        student.delete()
+        student.save()
+        return redirect('dashboard')
+    student.delete()
+    return redirect('dashboard')

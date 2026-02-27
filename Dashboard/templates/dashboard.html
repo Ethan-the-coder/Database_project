@@ -11,7 +11,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg bg-success">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Student Manager</a>
         <div class="collapse navbar-collapse">
@@ -48,7 +48,7 @@
                            <p class="card-text">{{ student.age }}<br>{{ student.gender }}<br>{{ student.email }}<br>{{ student.date }}</p>
                         <div class="card-actions">
                             <a href="{% url 'update_student' student.id %}" class="btn btn-sm btn-primary">Edit</a>
-                            <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger">Delete</a>
                         </div>
                     </div>
                 </div>
