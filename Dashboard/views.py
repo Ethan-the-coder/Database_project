@@ -1,8 +1,13 @@
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
 from Dashboard.models import Student
 
 # Create your views here.
+@login_required
 def dashboard(request):
     students = Student.objects.all()
     return render(request, 'dashboard.html', {'students': students})
@@ -51,3 +56,29 @@ def delete_student(request, id):
         return redirect('dashboard')
     student.delete()
     return redirect('dashboard')
+
+
+
+def signup(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'User already exists')
+            return redirect('signup')
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        login(request, user)
+        return redirect('dashboard')
+    return render(request, 'sign_up.html')
+
+
+
+
+
+
+
