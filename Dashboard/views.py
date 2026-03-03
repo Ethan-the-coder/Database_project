@@ -1,5 +1,6 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
@@ -57,13 +58,12 @@ def delete_student(request, id):
     student.delete()
     return redirect('dashboard')
 
-
-
-def signup(request):
+def signup (request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+
         if User.objects.filter(username=username).exists():
             messages.error(request, 'User already exists')
             return redirect('signup')
@@ -76,9 +76,42 @@ def signup(request):
         return redirect('dashboard')
     return render(request, 'sign_up.html')
 
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('dashboard')
+#         else:
+#             messages.error(request, 'Invalid username or password.')
+#             return redirect('login')
+#
+#     return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 
-
-
-
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, 'Login successful')
+                return redirect('dashboard')
+            else:
+                messages.error("Invalid username or password.")
+        else:
+            messages.error(request, "Please input the fields below.")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
 

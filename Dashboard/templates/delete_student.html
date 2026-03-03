@@ -7,23 +7,15 @@
 </head>
 <body>
 
-{#<div class="container mt-5">#}
-{#    <div class="row justify-content-center">#}
-{#        <div class="col-md-6">#}
-{##}
-{#            <div class="card shadow">#}
-{#                <div class="card-header bg-primary text-white">#}
-                    <form method="POST">
-                        {% csrf_token %}
+<div class="container mt-5">
+     <form method="POST">
+     {% csrf_token %}
 
-                             <p>Are you sure you want to delete "{{ student.id }}"?</p>
-                            <button type="submit">Confirm Delete</button>
-                            <a href="{% url 'dashboard' %}">Cancel</a>
-                    </form>
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
+       <p>Are you sure you want to delete "{{ student.name }}"?</p>
+       <button type="submit">Confirm Delete</button>
+       <a href="{% url 'dashboard' %}">Cancel</a>
+
+     </form>
+</div>
 </body>
 </html>
