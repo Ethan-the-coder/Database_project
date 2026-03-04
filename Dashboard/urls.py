@@ -28,5 +28,6 @@ urlpatterns = [
     path('deletestudent/<int:id>/',views.delete_student, name='delete_student'),
     path('login/',views.login_view, name='login'),
     path('logout/',views.logout_view, name='logout'),
+    path('payment/<int:id>',views.payment, name='payment'),
 
 ]

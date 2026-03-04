@@ -4,8 +4,10 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
+from django_daraja.mpesa.core import MpesaClient
 
-from Dashboard.models import Student
+from Dashboard.models import Student, Payment
+
 
 # Create your views here.
 @login_required
@@ -76,42 +78,75 @@ def signup (request):
         return redirect('dashboard')
     return render(request, 'sign_up.html')
 
-# def login_view(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('dashboard')
-#         else:
-#             messages.error(request, 'Invalid username or password.')
-#             return redirect('login')
-#
-#     return render(request, 'login.html')
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')
+
+    return render(request, 'login.html')
+
+
+
+
+
 
 def logout_view(request):
     logout(request)
     return redirect('login')
 
 
-def login_view(request):
+# def login_view(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 messages.success(request, 'Login successful')
+#                 return redirect('dashboard')
+#             else:
+#                 messages.error("Invalid username or password.")
+#         else:
+#             messages.error(request, "Please input the fields below.")
+#     else:
+#         form = AuthenticationForm()
+#     return render(request, 'login.html', {'form': form})
+
+
+
+
+
+def payment(request, id):
+    student = get_object_or_404(Student, id=id)
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, 'Login successful')
-                return redirect('dashboard')
-            else:
-                messages.error("Invalid username or password.")
-        else:
-            messages.error(request, "Please input the fields below.")
-    else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+        phone = request.POST.get('phone')
+        amount = request.POST.get('amount')
+        if not phone or not amount:
+            messages.error(request, 'Please fill out all fields required!')
+            return render (request, 'payment.html', {'student': student})
+        try:
+            client = MpesaClient()
+            response = client.stk_push(phone,int(amount),'eMobilis','Payment of fee', 'https://example.com/callback/').json()
+            Payment.objects.create(
+                user=request.user,
+                phone=phone,
+                amount=amount,
+                checkout_request_id=response.get('checkout_request_id',''),
+                status='Pending'
+            )
+
+            messages.success(request, 'STK Sent! Check your phone!')
+        except Exception :
+            messages.error(request, 'Something went wrong!')
+    return render(request, 'payment.html',{'student': student})
 
