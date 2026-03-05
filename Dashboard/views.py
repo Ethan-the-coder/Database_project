@@ -56,9 +56,11 @@ def delete_student(request, id):
     if request.method == 'POST':
         student.delete()
         student.save()
-        return redirect('dashboard')
+        messages.success(request, f'Student "{student.id}" was successfully deleted.')
+        return redirect('delete_student', id=student.id)
     student.delete()
     return redirect('dashboard')
+
 
 def signup (request):
     if request.method == 'POST':
@@ -86,44 +88,19 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            messages.success(request, 'Login successful')
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
             return redirect('login')
-
+    else:
+        messages.error(request, "Please input the fields below.")
     return render(request, 'login.html')
-
-
-
-
 
 
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-
-# def login_view(request):
-#     if request.method == 'POST':
-#         form = AuthenticationForm(request, data=request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 messages.success(request, 'Login successful')
-#                 return redirect('dashboard')
-#             else:
-#                 messages.error("Invalid username or password.")
-#         else:
-#             messages.error(request, "Please input the fields below.")
-#     else:
-#         form = AuthenticationForm()
-#     return render(request, 'login.html', {'form': form})
-
-
-
 
 
 def payment(request, id):
